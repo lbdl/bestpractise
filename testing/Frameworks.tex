@@ -1,0 +1,539 @@
+%        File: Frameworks.tex
+%     Created: Sat Mar 26 09:00 pm 2016 G
+% Last Change: Sat Mar 26 09:00 pm 2016 G
+%
+\documentclass[a4paper, titlepage]{article}
+
+% We include the color package in the below included
+% file which sets up some custom colors
+\usepackage{xcolor}
+\input{../colours.tex}
+\input{ac_text.tex}
+
+\usepackage{fontspec}
+\usepackage[urlcolor=blue, colorlinks=true]{hyperref}
+
+\usepackage[breakable]{tcolorbox}
+\tcbuselibrary{minted}
+\tcbuselibrary{breakable}
+\input{boxes.tex}
+
+%\usepackage{minted}
+
+\setmainfont{Georgia}
+\setmonofont{Inconsolata}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+
+%\newcommand{\ac}[2]{\textcolor{cobalt}{\texttt{#1 [\textcolor{red}{#2}]}}}
+
+\title{An Investigation into frameworks for Test Driven
+Development on the iOS platform with further
+analysis of Business Driven Development as it relates to test naming
+conventions and their support or otherwise in the considered frameworks}
+
+\author{Tim Storey \hfill for \hfill ICSA Software Ltd.
+        \\\texttt{tim.storey@mail.com}}
+
+\date{March, 2016}
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+  The document presents an analysis of various testing frameworks
+  namely,
+  \\Specta\footnote{\url{https://github.com/specta/specta}}, a testing
+  framework that supports BDD type syntax,
+  \\Expecta\footnote{\url{https://github.com/specta/expecta}}, a matcher
+  framework 
+  \\Cedar\footnote{\url{https://github.com/pivotal/cedar}}, another
+  framework that supports BDD syntax and has built in matchers, and XCTest, XCode's native testing library and its
+  assertions.
+  \\Finally we will consider Swift, mocking implications and the
+  Quick\footnote{\url{https://github.com/Quick/Quick}}
+  library and its matcher library Nimble\footnote{\url{https://github.com/Quick/Nimble}}. 
+
+  The document will consider the relative merits of each in
+  turn and the merits of using matchers over the native assertions of
+  XCTest. The document will further consider the  BDD syntax available with the
+  libraries and its merits in terms of naming as it relates to tests as code documentation
+  and ease of description of both business logic and unit test as well
+  as its use in ticket creation and deliverable estimations.
+  
+  We will also consider the ease of integration of the 
+  libraries to a CI system and the possibilities offered by Quick and
+  writing tests in Swift as an aid to learning the new language.
+  \end{abstract}
+
+{\hypersetup{linkcolor=black} \tableofcontents } 
+%\tableofcontents
+\newpage
+
+\section{Introduction}
+  \label{sec:Intro}
+  Unit testing is fairly new in regards to iOS, it was first added to
+  XCode5 as a native library in the form of XCTest although it has been available
+  as the SenTestingKit for OSx since XCode 2. As such it has not become such an
+  integral part of a development strategy as it has in other
+  platforms particularly in the world of Java based server development.
+
+  A discussion of the merits or otherwise of TDD is beyond the scope of
+  this document, here we assume that it \textbf{IS} desirable to write
+  code in a test first manner and as such want to help this aim with the best
+  tool kit for the job.
+  
+  There has also been move toward allowing for a 
+  BDD\footnote{\url{https://en.wikipedia.org/wiki/Behavior-driven_development}} 
+  like syntax whereby a system is
+  described in a language more suited to the business needs itself, this
+  language attempts to match the actual behavior and expectations of
+  the system.\\For example we might define a requirement as a user
+  story in the following manner capturing \textit{role},
+  \textit{feature} and \textit{benefit};
+
+  \begin{spec}{0.5}
+    \ac{As a }{ROLE}\\
+    \ac{I want }{FEATURE}\\
+    \ac{So that }{VALUE/OUTCOME}
+  \end{spec}
+
+  Then we might decompose each part of the user story in a
+  manner that explains how the user expects the system to behave, i.e. we
+  would describe a scenario in terms of acceptance criteria;
+
+  \begin{spec}{0.5}
+    \ac{Given:}{some CONTEXT}\\
+    \ac{When:}{some EVENT}\\
+    \ac{Then:}{some ACTION}
+  \end{spec}
+
+  It is becoming common to specify behaviors this way as it allows
+  scenarios to be described in manner which allows developers to build
+  up code that matches the requirements easily without wasted effort and
+  it also provides acceptance criteria. It is however worth noting that
+  this will never be perfect and a degree of pragmatism is as always
+  needed.
+  
+  XCTest is essentially Apple's version of OCUnit/SenTestingKit and is quite an
+  old library,
+  as such whilst OCUnit works well it was never really written with more
+  modern testing practices in mind, by which I mean the use of a BDD like syntax, it does
+  not have any support for matchers or context based tests furthermore
+  asynchronous testing is only a recent addition. These 
+  limitations that are fine when testing in a \textit{Test Last}
+  situation (referred to as Unit Testing) and also work fine for simple
+  TDD are less useful when we wish to consider our code as not only
+  fulfilling requirements but also acting as documentation for later
+  developers (ourselves included!)\\
+
+\section{BDD syntax}
+  BDD\footnote{\url{https://en.wikipedia.org/wiki/Behavior-driven_development}}
+  is a relatively new (it was formally defined in 2009) process that is in
+  essence an extension of TDD methodologies. As briefly explained in the
+  section~\nameref{sec:Intro} it is a means of extending TDD and
+  providing a syntax that closely matches Agile's (and to some extent UML's) User
+  Stories which further creates acceptance testing criteria. 
+  It has a simple syntax and
+  grammar that allows the capture and expression of concepts
+  understandable to the whole business.
+
+  Essentially we can view this as an attempt (and rather a successful
+  one) at bridging the languages that exists through varying levels of
+  a business, from Product Owners to the Business and from Developers to
+  Business Analysts/Project Manager. 
+  
+  To explain this a little more most commonly a business will tend to be split
+  into three language \textit{levels}, by which I mean three different approaches
+  to the common goal and thus three entirely different manners of
+  expressing the goal.
+
+  The \textit{levels} might be considered to be something like
+  
+  \begin{enumerate}
+    \item{Business/Product Owner}
+    \item{Business Analyst/Product Manager}
+    \item{Developers}
+  \end{enumerate}
+  
+  Using BDD we try to create a bridge between all the \textit{levels} and thus
+  work toward ensuring that the team communicates each part's needs
+  effectively to the other part's. 
+
+  As such we end up with a series of logical \textit{contexts} that define
+  area's of logic, both in terms of business logic (that managers
+  understand) and functional logic (that developers understand).
+
+  There is no formal strict specification of how this should be done,
+  the given team must reach its own agreement of the best means of
+  describing the various levels of story.
+
+  For example let us consider the following requirement that is actually
+  in an existing ticket. 
+
+  \subsection{A worked Example}
+
+  The business wants an icon to be displayed on a cell if the document can be backed
+  up using CrossPlatformSync, a new feature just added to the product. 
+  This is a trivial example but shows the general idea.
+
+  We might capture this as a User Story in the following manner
+  \begin{tspec}{1.0}{User Story}
+    \centering
+      \ac{As a}{USER}\\
+      \ac{I want}{To see an icon displayed on a document icon}\\
+      \ac{So that}{I know I can backup my document across platforms}
+  \end{tspec}
+
+  This is somewhat contrived but it illustrates the general idea.
+  \\We can break this down further by driving out the \textbf{Acceptance
+  Criteria}, these allow us to know when the task can be considered
+  complete, these criteria are sometimes referred to as
+  \textbf{scenarios} or sometimes \textbf{specifications} and this
+  naming tends to be determined by the tooling used to write the tests.
+  For our purposes we will refer to these as specifications or specs.
+  \\So we end up with a spec that might look something like this.
+
+  \begin{tspec}{1}{Cross platform sync icon display}
+      \ac{Given}{I am working online}\\
+    \ac{And}{I have logged in successfully}\\
+    \ac{And}{I have documents that I have permissions to view}\\
+    \ac{And}{I have downloaded these documents}\\
+    \ac{Then}{I want to see those documents listed}\\
+    \ac{And}{Cross platform sync is available}\\
+    \ac{Then}{I want to see the cross platform sync icon}\\
+  \end{tspec}
+
+  As can be seen we have now managed to drive out a lot of separate
+  acceptance criteria that are all involved in the original user story \hyperref[Ex:User Story]{Example 2.1 User Story}
+  so we might think about creating some more user stories, perhaps
+  something along the lines of
+
+  \begin{itemize}
+    \item{User authorization}
+    \item{Document download}
+  \end{itemize}
+
+  These themselves may have acceptance criteria look something like
+
+  \begin{tspec}{1}{User Authorization}
+    \ac{As a}{USER}\\
+    \ac{I want}{To be able to login}\\
+    \ac{So that}{I can use the application}
+  \end{tspec}
+
+  \begin{tspec}{1}{Document download}
+    \ac{As a}{USER}\\
+    \ac{I want}{To be able see a list of my documents}\\
+    \ac{So that}{I can use them}\\
+  \end{tspec}
+
+  This is somewhat contrived but it illustrates the general idea.
+
+  All of the derived acceptance criteria can be considered to be discrete
+  logic areas that will require development work, and as such become 
+  our \textbf{requirements} or in terms of a testing framework that supports BDD 
+  \textbf{contexts}.
+  
+  We will be developing the code to reach these criteria in a test
+  first manner and we can build up the tests and thus the code wrapped
+  in one of the contexts that we have just defined.
+
+  This structure also works well for describing the integration tests
+  that QA will need to do to ensure that we have met the requirements.
+  We will come back to this in \hyperref[sec:integration tests]{Functional/Integration tests}
+  
+  This example is somewhat contrived (though based on a ticket) and could 
+  be worked further but it is not the intention to
+  fully explore BDD here merely to show its utility.
+
+\section{Specs as tickets and estimation}
+  As we can see the BDD syntax drives out the criteria we need to meet
+  for the story to be accepted and thus we need to build up our code under 
+  test to meet these.
+
+  Considering the requirements for \textbf{Cross Platform Sync icon display}
+  and assuming we have now refined the specs to the following;
+
+  \begin{tspec}{1}{Display Cross Platform Sync Icon}
+    \ac{Given}{There are documents displayed for a meeting}\\
+    \ac{And}{Cross platform sync is enabled}\\
+    \ac{Then}{I want to see the cross platform sync icon displayed}
+  \end{tspec}
+
+  the specs so far are descriptive enough to capture
+  the story at a fairly high level and can be easily enough
+  understood across the levels of the business but in terms of
+  development we are going to need to go deeper and create specs
+   for the development teams, really it's these technical specs,
+  that we can consider as a sub category of a BDD User Story that we
+  are most interested in for the purposes of this document.
+
+  These technical specs will define the functional requirements of the code we are
+  developing.
+
+  \subsection{Developing functional requirements and tickets}
+   Let's assume that most of the code for the spec is already covered i.e. documents
+  are downloaded and displayed correctly we just need to write some code
+  to set a BOOL flag that indicates that the icon needs display.
+
+  We have prevously decided architecture and know that the document
+  icons are displayed as cells in a table view, this has a working data
+  source etc so that takes care of the \texttt{Given} part of the the
+  spec. 
+
+  Given the above asumption we could now make 2 tickets to capture the
+  deliverables that represent the story, if we had no data source nor
+  table view then that of course would become another deliverable
+  albeit a big one.
+  
+  So then these tickets are going to be 
+
+  \begin{enumerate}
+    \item{Determine if cross platform sync is enabled}
+    \item{Display icon if cross platform is enabled}
+  \end{enumerate}
+
+  Looking into the first one we find out that there are a couple of
+  conditions that determine wether or not cross platform sync is
+  enabled, these conditions should be captured somewhere probably in the
+  ticket or in someone's head but unless it's really complex that's
+  probably enough for the ticket and the BDD like description of
+  requirements to cover a scenario, the information we now need as
+  developers is not the information that business needs to know, however
+  we do now have small deliverable tickets and furthermore these tickets
+  clearly capture the requirements.
+  
+  
+  Looking at the first ticket we decide that it makes sense to create a
+  small reusable and extensible helper class that can capture the logic
+  we need and return a BOOL value that determines wether or not to
+  display the icon, the class responsible for displaying the icon can
+  the use this new helper class, and we will give it the class as a
+  dependency thus decoupling our logic like good nerds.
+
+  We will build this code up under test and we are therefore likely
+  going to need two test cases one for the new class and one for the
+  class that has a dependency on this new helper class.
+
+  We know that we determine the availability of CrossPlatformSync based
+  on server version and on permissions held in the users organisation
+  profile.
+
+  The server version is available to the table view that configures the
+  cell and the users permissions regarding backup are held in the
+  organisation profile.
+
+  Therefore we decide to make a simple helper class that exposes a boolean
+  function to which we pass the server version and the organisation
+  profile.
+
+  Assuming we are calling the class CrossPlatformSyncHelper we might
+  end up with a test class somthing like the following (for the sake of
+  brevity a lot of boilerplate has been removed);
+
+  \begin{listbox}{1}{XCTest Case first parse}
+      - (void)test_InitializationCalls
+      {
+          XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Did not init");
+      }
+
+      - (void)test_initialisesWithAMinimumServerVersion
+      {
+          self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
+          XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Failed to initialise class");
+          XCTAssertEqual(self.crossPlatformSyncSupportHelperUnderTest.minimumDocumentServerVersion, 1, @"Failed to set server version");
+      }
+
+      - (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue
+      {
+          [self mockBoardData];
+          OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+          organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+
+          OCMStub([self.mockedBoardData currentOrganisationProfile]).andReturn(organisationProfile);
+          XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest
+          isCrossPlatformSyncEnabledForDocumentServerVersion:1
+          withProfile: [self.mockedBoardData currentOrganisationProfile]], @"Does not return true for server version 1");
+      }
+
+      - (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue
+      {
+          [self mockBoardData];
+          OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+          organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+
+          XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForOrganisationProfile:organisationProfile], @"Does not return TRUE when valid in org profile");
+      }
+  \end{listbox}
+
+
+
+
+
+  So we can now see how using BDD we can start with a high level
+  \textit{User
+  Story} or \textit{Main Storey} or \textit{Use Case}, pick your own preferred term here
+  that the Business and Preoject Manager and Business Analyst can
+  understand and agree upon. 
+  
+  This then can be used to drive out further requirements, which in turn
+  creates some acceptance criteria which are in turn deliverables or
+  tickets and so forth and possibly most importantly each ``level'' of the
+  business can now describe their own requirements in a manner that
+  suits them.
+
+  Hopefully it can also be seen that this leads to the posiiblity of
+  testing as documention but we will will get back to this.
+\section{Specta test framework}
+  Specta is a well supported and well used testing framework available
+  as source and as library and hosted on Github.
+
+  It is an open source project and well supported and used (1647 stars
+  at last count) and still under development, its is hard to find a list
+  of companies suing it but the 
+\section{Cedar framework}
+\section{Quick framework and the Nimble matcher framework}
+\section{Matchers vs Assertions}
+\section{Test naming as documentation}
+\section{Naming in relation to tickets (BDD again)}
+\section{Integration with XCode}
+\section{Support implications}
+  \section{Swift and possibilities for learning via testing}
+\section{Pros and cons}
+\section{Integration to CI}
+\section{Functional/Integration tests}\label{sec:integration tests}
+  Integration testing with Kalabash and Cucumber
+\section{Conclusion}
+  
+\end{document}
+
+%@implementation CrossPlatformSyncSupportHelper
+%
+%- (BoardData*)boardData
+%{
+%    if (_boardData == Nil)
+%    {
+%       _boardData = [BoardData boardData];
+%    }
+%
+%    return _boardData;
+%}
+%
+%+ (CrossPlatformSyncSupportHelper *)supportHelperWithMinimumDocumentServerVersion:(int)minimumServerVersion
+%{
+%    return [[CrossPlatformSyncSupportHelper alloc] initWithMinimumDocumentServerVersion:minimumServerVersion];
+%}
+%
+%- (instancetype)initWithMinimumDocumentServerVersion:(NSInteger)minimumServerVersion
+%{
+%    self = [super init];
+%    if (self)
+%    {
+%        _minimumDocumentServerVersion = minimumServerVersion;
+%    }
+%
+%    return self;
+%}
+%
+%
+%- (BOOL)isCrossPlatformSyncEnabledForDocumentServerVersion:(NSInteger)serverVersion
+%{
+%    if ([self isCrossPlatformSyncEnabledForOrganisationProfile:[self.boardData currentOrganisationProfile]])
+%    {
+%        if ([self isCorrectServerVersion:serverVersion])
+%        {
+%            return YES;
+%        }
+%        else
+%        {
+%            return NO;
+%        }
+%    }
+%    else
+%    {
+%        return NO;
+%    }
+%}
+%
+%- (BOOL)isCorrectServerVersion:(NSInteger)serverVersion
+%{
+%    if (serverVersion >= _minimumDocumentServerVersion)
+%    {
+%        return YES;
+%    }
+%    else
+%    {
+%        return NO;
+%    }
+%}
+%
+%
+%- (BOOL)isCrossPlatformSyncEnabledForOrganisationProfile:(OrganisationProfile *)organisationProfile
+%{
+%    if ([organisationProfile.AllowBackup boolValue] == YES )
+%    {
+%        return YES;
+%    }
+%    else
+%    {
+%        return NO;
+%    }
+%}
+%@end
+
+
+%- (void)setUp
+%{
+%    [super setUp];
+%    self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
+%}
+%
+%- (void)tearDown
+%{
+%    self.crossPlatformSyncSupportHelperUnderTest = nil;
+%    [super tearDown];
+%}
+%
+%- (void)test_InitializationCalls
+%{
+%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Did not init");
+%}
+%
+%- (void)test_initialisesWithAMinimumServerVersion
+%{
+%    self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
+%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Failed to initialise class");
+%    XCTAssertEqual(self.crossPlatformSyncSupportHelperUnderTest.minimumDocumentServerVersion, 1, @"Failed to set server version");
+%}
+%
+%- (void)test_afterInitialisationWeHaveAMockedBoardDataInstanceToUse
+%{
+%    [self mockBoardData];
+%    _crossPlatformSyncSupportHelperUnderTest.boardData = self.mockedBoardData;
+%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest.boardData, @"Did not set Blueprint property");
+%    XCTAssertEqualObjects(self.crossPlatformSyncSupportHelperUnderTest.boardData, self.mockedBoardData, @"We are not using a mocked blueprint instance");
+%}
+%
+%- (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue
+%{
+%    [self mockBoardData];
+%    OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+%    organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+%
+%    OCMStub([self.mockedBoardData currentOrganisationProfile]).andReturn(organisationProfile);
+%    XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForDocumentServerVersion:1], @"Does not return true for server version 1");
+%}
+%
+%- (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue
+%{
+%    [self mockBoardData];
+%    OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+%    organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+%
+%    XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForOrganisationProfile:organisationProfile], @"Does not return TRUE when valid in org profile");
+%}

@@ -1,0 +1,33 @@
+      - (void)test_InitializationCalls
+      {
+          XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Did not init");
+      }
+
+      - (void)test_initialisesWithAMinimumServerVersion
+      {
+          self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
+          XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Failed to initialise class");
+          XCTAssertEqual(self.crossPlatformSyncSupportHelperUnderTest.minimumDocumentServerVersion, 1, @"Failed to set server version");
+      }
+
+      - (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue
+      {
+          [self mockBoardData];
+          OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+          organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+
+          OCMStub([self.mockedBoardData currentOrganisationProfile]).andReturn(organisationProfile);
+          XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest
+          isCrossPlatformSyncEnabledForDocumentServerVersion:1
+          withProfile: [self.mockedBoardData currentOrganisationProfile]], @"Does not return true for server version 1");
+      }
+
+      - (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue
+      {
+          [self mockBoardData];
+          OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
+          organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
+
+          XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForOrganisationProfile:organisationProfile], @"Does not return TRUE when valid in org profile");
+      }
+  

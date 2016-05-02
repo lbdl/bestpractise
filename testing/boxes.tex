@@ -1,0 +1,18 @@
+% Box defines, we are using package tcolorbox, this is not added here
+% but in the main file. This file should then be inputted directly
+% below.
+
+\newtcolorbox{spec}[1]{before=\par\smallskip\centering, after=\par,
+width=#1\linewidth, colback=cosmiclatte, colframe=cobalt, halign=center}
+
+\newtcolorbox[auto counter, number within=section]{tspec}[2]{before=\par\smallskip\centering, after=\par,
+width=#1\linewidth, colback=cosmiclatte, colframe=cobalt,
+fonttitle=\bfseries, title=Example~\thetcbcounter: #2, halign=center,
+label={Ex:#2}}
+
+\newtcblisting[auto counter, number within=section]{listbox}[2]{
+width=#1\linewidth, colback=cosmiclatte, colframe=cobalt,
+fonttitle=\bfseries, title=Listing~\thetcbcounter: #2, halign=center,
+label={Cd:#2}, breakable, before=\par\smallskip\centering, after=\par,
+listing only, minted language=objc, minted options={breaklines=true,
+breakanywhere=true, fontsize=\small}}

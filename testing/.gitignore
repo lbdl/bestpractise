@@ -1,0 +1,10 @@
+*.log
+*.pdf
+*.aux
+*.docx
+/docx
+*.bbl
+*.blg
+*.out
+*.toc
+_minted*
