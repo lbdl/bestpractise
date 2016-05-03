@@ -11,7 +11,7 @@
 \input{ac_text.tex}
 
 \usepackage{fontspec}
-\usepackage[urlcolor=blue, colorlinks=true]{hyperref}
+\usepackage[urlcolor=blue, colorlinks=false]{hyperref}
 
 \usepackage[breakable]{tcolorbox}
 \tcbuselibrary{minted}
@@ -119,14 +119,14 @@ conventions and their support or otherwise in the considered frameworks}
   this will never be perfect and a degree of pragmatism is as always
   needed.
   
-  XCTest is essentially Apple's version of OCUnit/SenTestingKit and is quite an
+  XCTest is Apple's version of OCUnit/SenTestingKit and is quite an
   old library,
   as such whilst OCUnit works well it was never really written with more
-  modern testing practices in mind, by which I mean the use of a BDD like syntax, it does
-  not have any support for matchers or context based tests furthermore
+  modern testing practices in mind, by which I mean the use of a BDD like syntax. It does
+  not have any support for matchers (although these can be added) or context based tests furthermore
   asynchronous testing is only a recent addition. These 
   limitations that are fine when testing in a \textit{Test Last}
-  situation (referred to as Unit Testing) and also work fine for simple
+  situation (i.e. Unit Testing) and also work fine for simple
   TDD are less useful when we wish to consider our code as not only
   fulfilling requirements but also acting as documentation for later
   developers (ourselves included!)\\
@@ -162,10 +162,10 @@ conventions and their support or otherwise in the considered frameworks}
   
   Using BDD we try to create a bridge between all the \textit{levels} and thus
   work toward ensuring that the team communicates each part's needs
-  effectively to the other part's. 
+  effectively to the other parts of the business. 
 
   As such we end up with a series of logical \textit{contexts} that define
-  area's of logic, both in terms of business logic (that managers
+  units of work, both in terms of business logic (that managers
   understand) and functional logic (that developers understand).
 
   There is no formal strict specification of how this should be done,
@@ -179,7 +179,7 @@ conventions and their support or otherwise in the considered frameworks}
 
   The business wants an icon to be displayed on a cell if the document can be backed
   up using CrossPlatformSync, a new feature just added to the product. 
-  This is a trivial example but shows the general idea.
+  This is a simple example but shows the general idea.
 
   We might capture this as a User Story in the following manner
   \begin{tspec}{1.0}{User Story}
@@ -189,14 +189,16 @@ conventions and their support or otherwise in the considered frameworks}
       \ac{So that}{I know I can backup my document across platforms}
   \end{tspec}
 
-  This is somewhat contrived but it illustrates the general idea.
-  \\We can break this down further by driving out the \textbf{Acceptance
-  Criteria}, these allow us to know when the task can be considered
+  We can break this down further by driving out the \textbf{Acceptance
+  Criteria}.
+  
+  These allow us to know when the task can be considered
   complete, these criteria are sometimes referred to as
   \textbf{scenarios} or sometimes \textbf{specifications} and this
   naming tends to be determined by the tooling used to write the tests.
   For our purposes we will refer to these as specifications or specs.
-  \\So we end up with a spec that might look something like this.
+  
+  So we end up with a spec that might look something like this.
 
   \begin{tspec}{1}{Cross platform sync icon display}
       \ac{Given}{I am working online}\\
@@ -232,8 +234,6 @@ conventions and their support or otherwise in the considered frameworks}
     \ac{So that}{I can use them}\\
   \end{tspec}
 
-  This is somewhat contrived but it illustrates the general idea.
-
   All of the derived acceptance criteria can be considered to be discrete
   logic areas that will require development work, and as such become 
   our \textbf{requirements} or in terms of a testing framework that supports BDD 
@@ -243,9 +243,8 @@ conventions and their support or otherwise in the considered frameworks}
   first manner and we can build up the tests and thus the code wrapped
   in one of the contexts that we have just defined.
 
-  This structure also works well for describing the integration tests
-  that QA will need to do to ensure that we have met the requirements.
-  We will come back to this in \hyperref[sec:integration tests]{Functional/Integration tests}
+  These requirements further describe the integration tests
+  that QA will need to do, but we will come back to this in \hyperref[sec:integration tests]{Functional/Integration tests}
   
   This example is somewhat contrived (though based on a ticket) and could 
   be worked further but it is not the intention to
@@ -253,8 +252,9 @@ conventions and their support or otherwise in the considered frameworks}
 
 \section{Specs as tickets and estimation}
   As we can see the BDD syntax drives out the criteria we need to meet
-  for the story to be accepted and thus we need to build up our code under 
-  test to meet these.
+  for the story to be accepted and as such we are now in a better
+  position to divide the needed development work up into distinct units which can be
+  captured as tickets.
 
   Considering the requirements for \textbf{Cross Platform Sync icon display}
   and assuming we have now refined the specs to the following;
@@ -267,10 +267,12 @@ conventions and their support or otherwise in the considered frameworks}
 
   the specs so far are descriptive enough to capture
   the story at a fairly high level and can be easily enough
-  understood across the levels of the business but in terms of
-  development we are going to need to go deeper and create specs
-   for the development teams, really it's these technical specs,
-  that we can consider as a sub category of a BDD User Story that we
+  understood across the levels of the business  to reach agreement
+  between the teams but in terms of
+  development we are going to need to go deeper and create finer grained
+  technical specifications that acheive the goals set out in the
+  requirements, really it's these technical specs
+  (that we might consider a sub category of a BDD User Story) that we
   are most interested in for the purposes of this document.
 
   These technical specs will define the functional requirements of the code we are
@@ -279,7 +281,7 @@ conventions and their support or otherwise in the considered frameworks}
   \subsection{Developing functional requirements and tickets}
    Let's assume that most of the code for the spec is already covered i.e. documents
   are downloaded and displayed correctly we just need to write some code
-  to set a BOOL flag that indicates that the icon needs display.
+  to set a \texttt{Boolean} flag that indicates that the icon needs display.
 
   We have prevously decided architecture and know that the document
   icons are displayed as cells in a table view, this has a working data
@@ -298,9 +300,9 @@ conventions and their support or otherwise in the considered frameworks}
     \item{Display icon if cross platform is enabled}
   \end{enumerate}
 
-  Looking into the first one we find out that there are a couple of
-  conditions that determine wether or not cross platform sync is
-  enabled, these conditions should be captured somewhere probably in the
+  Looking into the first one we discover that there are a couple of
+  conditions that determine whether or not cross platform sync is
+  enabled. These conditions should be captured somewhere, probably in the
   ticket or in someone's head but unless it's really complex that's
   probably enough for the ticket and the BDD like description of
   requirements to cover a scenario, the information we now need as
@@ -310,10 +312,12 @@ conventions and their support or otherwise in the considered frameworks}
   
   
   Looking at the first ticket we decide that it makes sense to create a
-  small reusable and extensible helper class that can capture the logic
-  we need and return a BOOL value that determines wether or not to
-  display the icon, the class responsible for displaying the icon can
-  the use this new helper class, and we will give it the class as a
+  small reusable, extensible helper class that can capture the logic
+  we need and return the \texttt{Boolean} value that determines wether or not to
+  display the icon. 
+  
+  The class responsible for displaying the icon can
+  then use this new helper class, and we will pass it to the class as a
   dependency thus decoupling our logic like good nerds.
 
   We will build this code up under test and we are therefore likely
@@ -370,9 +374,6 @@ conventions and their support or otherwise in the considered frameworks}
           XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForOrganisationProfile:organisationProfile], @"Does not return TRUE when valid in org profile");
       }
   \end{listbox}
-
-
-
 
 
   So we can now see how using BDD we can start with a high level
