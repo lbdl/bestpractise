@@ -283,12 +283,12 @@ conventions and their support or otherwise in the considered frameworks}
   are downloaded and displayed correctly we just need to write some code
   to set a \texttt{Boolean} flag that indicates that the icon needs display.
 
-  We have prevously decided architecture and know that the document
+  We have previously decided on an overall architecture and know that the document
   icons are displayed as cells in a table view, this has a working data
-  source etc so that takes care of the \texttt{Given} part of the the
+  source etc so that takes care of the \texttt{Given} part of the
   spec. 
 
-  Given the above asumption we could now make 2 tickets to capture the
+  Given the above assumption we could now make 2 tickets as subtasks to capture the
   deliverables that represent the story, if we had no data source nor
   table view then that of course would become another deliverable
   albeit a big one.
@@ -296,24 +296,30 @@ conventions and their support or otherwise in the considered frameworks}
   So then these tickets are going to be 
 
   \begin{enumerate}
-    \item{Determine if cross platform sync is enabled}
-    \item{Display icon if cross platform is enabled}
+    \item{\texttt{Determine if cross platform sync is enabled}}
+    \item{\texttt{Display icon if cross platform is enabled}}
   \end{enumerate}
+  
+  We now have small estimate able tickets that capture the information the
+  business need in terms they understand but the information we now need
+  as developers tasked with delivering the story is of course of a
+  different nature.  
 
-  Looking into the first one we discover that there are a couple of
+\section{BDD Syntax in Test Driven Development}
+
+  Investigating the first ticket we discover that there are a couple of
   conditions that determine whether or not cross platform sync is
-  enabled. These conditions should be captured somewhere, probably in the
-  ticket or in someone's head but unless it's really complex that's
-  probably enough for the ticket and the BDD like description of
-  requirements to cover a scenario, the information we now need as
-  developers is not the information that business needs to know, however
-  we do now have small deliverable tickets and furthermore these tickets
-  clearly capture the requirements.
-  
-  
-  Looking at the first ticket we decide that it makes sense to create a
+  enabled, we know that the availability of CrossPlatformSync is based
+  on server version and on permissions held in the users organisation
+  profile.
+
+  The server version is available to the table view that configures the
+  cell and the users permissions regarding backup are held in the
+  organisation profile.
+
+  Architecturally we decide that it makes sense to create a
   small reusable, extensible helper class that can capture the logic
-  we need and return the \texttt{Boolean} value that determines wether or not to
+  we need and return the \texttt{Boolean} value that determines whether or not to
   display the icon. 
   
   The class responsible for displaying the icon can
@@ -324,20 +330,8 @@ conventions and their support or otherwise in the considered frameworks}
   going to need two test cases one for the new class and one for the
   class that has a dependency on this new helper class.
 
-  We know that we determine the availability of CrossPlatformSync based
-  on server version and on permissions held in the users organisation
-  profile.
-
-  The server version is available to the table view that configures the
-  cell and the users permissions regarding backup are held in the
-  organisation profile.
-
-  Therefore we decide to make a simple helper class that exposes a boolean
-  function to which we pass the server version and the organisation
-  profile.
-
   Assuming we are calling the class CrossPlatformSyncHelper we might
-  end up with a test class somthing like the following (for the sake of
+  end up with a test class something like the following (for the sake of
   brevity a lot of boilerplate has been removed);
 
   \begin{listbox}{1}{XCTest Case first parse}
@@ -375,22 +369,36 @@ conventions and their support or otherwise in the considered frameworks}
       }
   \end{listbox}
 
-
-  So we can now see how using BDD we can start with a high level
-  \textit{User
-  Story} or \textit{Main Storey} or \textit{Use Case}, pick your own preferred term here
-  that the Business and Preoject Manager and Business Analyst can
-  understand and agree upon. 
+  The \mintinline{objc}{ XCTest Case} above covers all the functions we
+  need for our new class 
+  \mintinline{objc}{CrossPlatformSyncSupportHelper}
+  but it is hard to read the names and it doesn't match any level of BDD like syntax.
   
-  This then can be used to drive out further requirements, which in turn
-  creates some acceptance criteria which are in turn deliverables or
-  tickets and so forth and possibly most importantly each ``level'' of the
-  business can now describe their own requirements in a manner that
-  suits them.
+  We can see the following tests
 
-  Hopefully it can also be seen that this leads to the posiiblity of
-  testing as documention but we will will get back to this.
-\section{Specta test framework}
+  \begin{listbox}{1}{Test names}
+       (void)test_InitializationCalls;
+       (void)test_initialisesWithAMinimumServerVersion;
+       (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue;
+      (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
+  \end{listbox}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  \section{Specta test framework}
   Specta is a well supported and well used testing framework available
   as source and as library and hosted on Github.
 
