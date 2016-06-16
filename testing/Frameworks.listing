@@ -1,5 +1,22 @@
-       (void)test_InitializationCalls;
-       (void)test_initialisesWithAMinimumServerVersion;
-       (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue;
-      (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
+    describe(@"Initialization calls", ^{
+
+      ClassUnderTest *sut;
+
+      given(@"The pre-requisites are met", ^{
+
+          it(@"Should initialize from its designated initializer", ^{
+              sut = [ClassUnderTest alloc]init];
+              expect(sut).toNot(beNil());
+          });
+      });
+
+      given(@"We have intialized correctly", ^{
+
+        it(@"Performs the logic we want", ^{
+            expect([sut someMethod]).to.equal(someValue);
+        });
+
+      });
+
+    });
   

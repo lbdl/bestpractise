@@ -369,21 +369,71 @@ conventions and their support or otherwise in the considered frameworks}
       }
   \end{listbox}
 
-  The \mintinline{objc}{XCTest Case} above covers all the functions we
-  need for our new class 
-  \mintinline{objc}{CrossPlatformSyncSupportHelper} we have
-
-    \begin{listbox}{1}{Test names}
-       (void)test_InitializationCalls;
-       (void)test_initialisesWithAMinimumServerVersion;
-       (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue;
-      (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
+  
+The \mintinline{objc}{XCTest Case} above covers all the functions we
+  need for our new class, we have
+  
+   \begin{listbox}{1}{Test names}
+       test_InitializationCalls;
+       test_initialisesWithAMinimumServerVersion;
+       test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue;
+      test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
   \end{listbox}
 
-  Our tests cover the instantiation of the class and then its
-  functionality but it is hard to read the names and it doesn't match any level of BDD like syntax.
-  
+  Our tests cover the instantiating of the class and then its
+  functionality but it is hard to read the names and it doesn't match
+  any level of BDD like syntax, so although the functions are covered
+  and there is nothing to stop us building up our code in a test first
+  manner the final test class has little merit as documentation because
+  it is so hard to read. The test names reflect their purpose but it is
+  hard on the eyes.
 
+  Testing frameworks that support BDD allow us to restructure the test
+  cases into contexts via the use of a block based syntax.
+
+  We could therefore separate the above set of tests in to 2 separate
+  contexts, something like
+
+  \begin{enumerate}
+    \item{\texttt{Initialization}}
+    \item{\texttt{Cross platform sync logic}}
+  \end{enumerate}
+
+  Using the Specta or Quick framework we can write a test class that
+  looks like the following. 
+
+  \begin{listbox}{1}{Context Based Version}
+    describe(@"Initialization calls", ^{
+
+      ClassUnderTest *sut;
+
+      given(@"The pre-requisites are met", ^{
+
+          it(@"Should initialize from its designated initializer", ^{
+              sut = [ClassUnderTest alloc]init];
+              expect(sut).toNot(beNil());
+          });
+      });
+
+      given(@"We have intialized correctly", ^{
+          
+        it(@"Performs the logic we want", ^{
+            expect([sut someMethod]).to.equal(someValue);
+        });
+
+      });
+      
+    });
+  \end{listbox}
+
+  The above class is far more readable, the use of the
+  \texttt{Describe} and \texttt{Given} blocks allow us to seperate the
+  tests into logical areas that lead to a form of self
+  documenting code.
+  
+  We have pretty much managed to explain how a class
+  works with the Given Something has happened, Then Something else will
+  happen and we Expect Something to be Something syntax.
 
 
 
