@@ -35,7 +35,7 @@ analysis of Business Driven Development as it relates to test naming
 conventions and their support or otherwise in the considered frameworks}
 
 \author{Tim Storey \hfill for \hfill ICSA Software Ltd.
-        \\\texttt{tim.storey@mail.com}}
+        \\\texttt{tim.storey@gmail.com}}
 
 \date{March, 2016}
 
@@ -46,28 +46,11 @@ conventions and their support or otherwise in the considered frameworks}
 
 \begin{abstract}
   The document presents an analysis of various testing frameworks
-  namely,
-  \\Specta\footnote{\url{https://github.com/specta/specta}}, a testing
-  framework that supports BDD type syntax,
-  \\Expecta\footnote{\url{https://github.com/specta/expecta}}, a matcher
-  framework 
-  \\Cedar\footnote{\url{https://github.com/pivotal/cedar}}, another
-  framework that supports BDD syntax and has built in matchers, and XCTest, XCode's native testing library and its
-  assertions.
-  \\Finally we will consider Swift, mocking implications and the
-  Quick\footnote{\url{https://github.com/Quick/Quick}}
-  library and its matcher library Nimble\footnote{\url{https://github.com/Quick/Nimble}}. 
-
-  The document will consider the relative merits of each in
-  turn and the merits of using matchers over the native assertions of
+  and the merits of using matchers over the native assertions of
   XCTest. The document will further consider the  BDD syntax available with the
   libraries and its merits in terms of naming as it relates to tests as code documentation
   and ease of description of both business logic and unit test as well
   as its use in ticket creation and deliverable estimations.
-  
-  We will also consider the ease of integration of the 
-  libraries to a CI system and the possibilities offered by Quick and
-  writing tests in Swift as an aid to learning the new language.
   \end{abstract}
 
 %{\hypersetup{linkcolor=black} \tableofcontents } 
@@ -77,8 +60,8 @@ conventions and their support or otherwise in the considered frameworks}
 \section{Introduction}
   \label{sec:Intro}
   Unit testing is fairly new in regards to iOS, it was first added to
-  XCode5 as a native library in the form of XCTest although it has been available
-  as the SenTestingKit for OSx since XCode 2. As such it has not become such an
+  Xcode5 as a native library in the form of XCTest although it has been available
+  as the SenTestingKit for OSx since Xcode 2. As such it has not become such an
   integral part of a development strategy as it has in other
   platforms particularly in the world of Java based server development.
 
@@ -270,7 +253,7 @@ conventions and their support or otherwise in the considered frameworks}
   understood across the levels of the business  to reach agreement
   between the teams but in terms of
   development we are going to need to go deeper and create finer grained
-  technical specifications that acheive the goals set out in the
+  technical specifications that achieve the goals set out in the
   requirements, really it's these technical specs
   (that we might consider a sub category of a BDD User Story) that we
   are most interested in for the purposes of this document.
@@ -380,8 +363,8 @@ The \mintinline{objc}{XCTest Case} above covers all the functions we
       test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
   \end{listbox}
 
-  Our tests cover the instantiating of the class and then its
-  functionality but it is hard to read the names and it doesn't match
+  Our tests cover instantiating the class and its
+  functionality but it is hard to read the test names and it doesn't match
   any level of BDD like syntax, so although the functions are covered
   and there is nothing to stop us building up our code in a test first
   manner the final test class has little merit as documentation because
@@ -427,7 +410,7 @@ The \mintinline{objc}{XCTest Case} above covers all the functions we
   \end{listbox}
 
   The above class is far more readable, the use of the
-  \texttt{Describe} and \texttt{Given} blocks allow us to seperate the
+  \texttt{Describe} and \texttt{Given} blocks allow us to separate the
   tests into logical areas that lead to a form of self
   documenting code.
   
@@ -436,158 +419,11 @@ The \mintinline{objc}{XCTest Case} above covers all the functions we
   happen and we Expect Something to be Something syntax.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{Cedar framework}
-\section{Quick framework and the Nimble matcher framework}
 \section{Matchers vs Assertions}
-\section{Test naming as documentation}
-\section{Naming in relation to tickets (BDD again)}
-\section{Integration with XCode}
-\section{Support implications}
-  \section{Swift and possibilities for learning via testing}
-\section{Pros and cons}
-\section{Integration to CI}
-\section{Functional/Integration tests}\label{sec:integration tests}
-  Integration testing with Kalabash and Cucumber
+\section{Quick framework and the Nimble matcher framework}
+\section{Swift and possibilities for learning via testing}
 \section{Conclusion}
   
 \end{document}
 
-%@implementation CrossPlatformSyncSupportHelper
-%
-%- (BoardData*)boardData
-%{
-%    if (_boardData == Nil)
-%    {
-%       _boardData = [BoardData boardData];
-%    }
-%
-%    return _boardData;
-%}
-%
-%+ (CrossPlatformSyncSupportHelper *)supportHelperWithMinimumDocumentServerVersion:(int)minimumServerVersion
-%{
-%    return [[CrossPlatformSyncSupportHelper alloc] initWithMinimumDocumentServerVersion:minimumServerVersion];
-%}
-%
-%- (instancetype)initWithMinimumDocumentServerVersion:(NSInteger)minimumServerVersion
-%{
-%    self = [super init];
-%    if (self)
-%    {
-%        _minimumDocumentServerVersion = minimumServerVersion;
-%    }
-%
-%    return self;
-%}
-%
-%
-%- (BOOL)isCrossPlatformSyncEnabledForDocumentServerVersion:(NSInteger)serverVersion
-%{
-%    if ([self isCrossPlatformSyncEnabledForOrganisationProfile:[self.boardData currentOrganisationProfile]])
-%    {
-%        if ([self isCorrectServerVersion:serverVersion])
-%        {
-%            return YES;
-%        }
-%        else
-%        {
-%            return NO;
-%        }
-%    }
-%    else
-%    {
-%        return NO;
-%    }
-%}
-%
-%- (BOOL)isCorrectServerVersion:(NSInteger)serverVersion
-%{
-%    if (serverVersion >= _minimumDocumentServerVersion)
-%    {
-%        return YES;
-%    }
-%    else
-%    {
-%        return NO;
-%    }
-%}
-%
-%
-%- (BOOL)isCrossPlatformSyncEnabledForOrganisationProfile:(OrganisationProfile *)organisationProfile
-%{
-%    if ([organisationProfile.AllowBackup boolValue] == YES )
-%    {
-%        return YES;
-%    }
-%    else
-%    {
-%        return NO;
-%    }
-%}
-%@end
 
-
-%- (void)setUp
-%{
-%    [super setUp];
-%    self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
-%}
-%
-%- (void)tearDown
-%{
-%    self.crossPlatformSyncSupportHelperUnderTest = nil;
-%    [super tearDown];
-%}
-%
-%- (void)test_InitializationCalls
-%{
-%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Did not init");
-%}
-%
-%- (void)test_initialisesWithAMinimumServerVersion
-%{
-%    self.crossPlatformSyncSupportHelperUnderTest = [CrossPlatformSyncSupportHelper supportHelperWithMinimumDocumentServerVersion:1];
-%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest, @"Failed to initialise class");
-%    XCTAssertEqual(self.crossPlatformSyncSupportHelperUnderTest.minimumDocumentServerVersion, 1, @"Failed to set server version");
-%}
-%
-%- (void)test_afterInitialisationWeHaveAMockedBoardDataInstanceToUse
-%{
-%    [self mockBoardData];
-%    _crossPlatformSyncSupportHelperUnderTest.boardData = self.mockedBoardData;
-%    XCTAssertNotNil(self.crossPlatformSyncSupportHelperUnderTest.boardData, @"Did not set Blueprint property");
-%    XCTAssertEqualObjects(self.crossPlatformSyncSupportHelperUnderTest.boardData, self.mockedBoardData, @"We are not using a mocked blueprint instance");
-%}
-%
-%- (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue
-%{
-%    [self mockBoardData];
-%    OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
-%    organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
-%
-%    OCMStub([self.mockedBoardData currentOrganisationProfile]).andReturn(organisationProfile);
-%    XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForDocumentServerVersion:1], @"Does not return true for server version 1");
-%}
-%
-%- (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue
-%{
-%    [self mockBoardData];
-%    OrganisationProfile *organisationProfile = [OrganisationProfile insertInManagedObjectContext:self.organisationProfileManagedObjectContext];
-%    organisationProfile.AllowBackup = [NSNumber numberWithBool:YES];
-%
-%    XCTAssertTrue([_crossPlatformSyncSupportHelperUnderTest isCrossPlatformSyncEnabledForOrganisationProfile:organisationProfile], @"Does not return TRUE when valid in org profile");
-%}
