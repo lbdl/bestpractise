@@ -371,17 +371,19 @@ conventions and their support or otherwise in the considered frameworks}
 
   The \mintinline{objc}{ XCTest Case} above covers all the functions we
   need for our new class 
-  \mintinline{objc}{CrossPlatformSyncSupportHelper}
-  but it is hard to read the names and it doesn't match any level of BDD like syntax.
-  
-  We can see the following tests
+  \mintinline{objc}{CrossPlatformSyncSupportHelper} we have
 
-  \begin{listbox}{1}{Test names}
+    \begin{listbox}{1}{Test names}
        (void)test_InitializationCalls;
        (void)test_initialisesWithAMinimumServerVersion;
        (void)test_givenADocumentServerVersionAboveZeroAndAnOrganisationProfileThatAllowsBackupThenCrossPlatformSyncReturnsTrue;
       (void)test_givenAnOrgProfileThatHasSyncEnabledLocalTestForSyncEnabledReturnsTrue;
   \end{listbox}
+
+  Our tests cover the instantiation of the class and then its
+  functionality but it is hard to read the names and it doesn't match any level of BDD like syntax.
+  
+
 
 
 
