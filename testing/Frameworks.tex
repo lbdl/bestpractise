@@ -20,7 +20,7 @@
 
 %\usepackage{minted}
 
-\setmainfont{Georgia}
+\setmainfont{Open Sans}
 \setmonofont{Inconsolata}
 
 \setlength{\parindent}{0pt}
@@ -37,7 +37,7 @@ conventions and their support or otherwise in the considered frameworks}
 \author{Tim Storey \hfill for \hfill ICSA Software Ltd.
         \\\texttt{tim.storey@gmail.com}}
 
-\date{March, 2016}
+\date{June, 2016}
 
 \begin{document}
 
@@ -415,15 +415,168 @@ The \mintinline{objc}{XCTest Case} above covers all the functions we
   documenting code.
   
   We have pretty much managed to explain how a class
-  works with the Given Something has happened, Then Something else will
-  happen and we Expect Something to be Something syntax.
+  works with the \texttt{GIVEN} Something has happened, \texttt{THEN} Something else will
+  happen and we \texttt{EXPECT} Something to be Something syntax.
 
 
 \section{Matchers vs Assertions}
+
+XCTest is assertion based, out of the box it provides the following
+macros
+
+\begin{listbox}{1}{XCTest Assertion Macros}
+XCTFail (format);
+XCTAssertNil (a1, format);
+XCTAssertNotNil (a1, format);
+XCTAssert (a1, format);
+XCTAssertTrue (a1, format);
+XCTAssertFalse (a1, format);
+XCTAssertEqualObjects (a1, a2, format);
+XCTAssertEquals (a1, a2, format);
+XCTAssertEqualsWithAccuracy (a1, a2, accuracy, format);
+XCTAssertThrows (expression, format);
+XCTAssertThrowsSpecific (expression, specificException, format);
+XCTAssertThrowsSpecificNamed (expression, specificException,
+exceptionName, format);
+XCTAssertNoThrow (expression, format);
+XCTAssertNoThrowSpecific (expression, specificException, format);
+XCTAssertNoThrowSpecificNamed (expression, specificExcepton,
+exceptionName, format);
+\end{listbox}
+
+These are fine and work as expected but when
+building up a complex set of tests that we would like to be very clear
+(i.e. read a documentation as well as cover the logic)
+they quickly become limited. 
+
+The only really meaninglfull error we get is the \texttt{format} string 
+we pass into the macro as the last parameter. Furthermore asynchronous 
+testing not trivially catered for.
+
+\begin{listbox}{1}{Asynchronous XCTest}
+- (void)testDownload
+    {
+        XCTestExpectation *expectation =
+            [self expectationWithDescription:@"High Expectations"];
+
+        [self.pageLoader requestUrl:@"http://fooBar.com"
+                  completionHandler:^(NSString *page) {
+                  
+            NSLog(@"The web page is %ld bytes long.", page.length);
+            XCTAssert(page.length > 0);
+            [expectation fulfill];
+        }];
+    
+        [self waitForExpectationsWithTimeout:5.0 handler:^(NSError *error) {
+            if (error) {
+                NSLog(@"Timeout Error: %@", error);
+            }
+        }];
+    }
+\end{listbox}
+
+Matcher frameworks act as an API to express outcomes of a code unit.
+
+The Nimble\footnote{\url{https://github.com/Quick/Nimble}}  framework
+bundled with Quick\footnote{\url{https://github.com/Quick}} provides 
+us with the ability to write out tests in a manner that is cleareras the
+test describes itself much in the same manner as the test frame work
+allows us to use the \texttt{GIVEN, THEN, AND, SHOULD} syntax, only for
+the matchers we use \texttt{EXPECT} something to \texttt{BE SOMETHING},
+we have the sameset of matches as with XCAsserts and more to boot.
+
+Nimble provides the following expectations.
+\begin{listbox}{1}{Nimble Matchers}
+// Passes if actual is equivalent to expected:
+expect(actual).to(equal(expected))
+
+// Passes if actual is not equivalent to expected:
+expect(actual).toNot(equal(expected))
+
+// Passes if actual has the same pointer address as expected:
+expect(actual).to(beIdenticalTo(expected));
+
+// Passes if actual does not have the same pointer address as expected:
+expect(actual).toNot(beIdenticalTo(expected));
+
+expect(actual).to(beLessThan(expected));
+expect(actual).to(beLessThanOrEqualTo(expected));
+expect(actual).to(beGreaterThan(expected));
+expect(actual).to(beGreaterThanOrEqualTo(expected));
+
+expect(actual).to(beCloseTo(expected).within(delta));
+
+// Passes if instance is an instance of aClass:
+expect(instance).to(beAnInstanceOf(aClass));
+
+// Passes if instance is an instance of aClass or any of its subclasses:
+expect(instance).to(beAKindOf(aClass));
+
+// Passes if actual is not nil, true, or an object with a boolean value of true:
+expect(actual).to(beTruthy());
+
+// Passes if actual is only true (not nil or an object conforming to BooleanType true):
+expect(actual).to(beTrue());
+
+// Passes if actual is nil, false, or an object with a boolean value of false:
+expect(actual).to(beFalsy());
+
+// Passes if actual is only false (not nil or an object conforming to BooleanType false):
+expect(actual).to(beFalse());
+
+// Passes if actual is nil:
+expect(actual).to(beNil());
+
+// Passes if expected is a member of actual:
+expect(actual).to(contain(expected));
+
+// Passes if actual is an empty collection (it contains no elements):
+expect(actual).to(beEmpty());
+
+// Passes if actual contains substring expected:
+expect(actual).to(contain(expected));
+
+// Passes if actual begins with substring:
+expect(actual).to(beginWith(expected));
+
+// Passes if actual ends with substring:
+expect(actual).to(endWith(expected));
+
+// Passes if actual is an empty string, "":
+expect(actual).to(beEmpty());
+
+// Passes if actual matches the regular expression defined in expected:
+expect(actual).to(match(expected))
+
+// passes if actual collection's count is equal to expected
+expect(actual).to(haveCount(expected))
+
+// passes if actual collection's count is not equal to expected
+expect(actual).notTo(haveCount(expected))
+\end{listbox}
+
+and indeed more to pass tests over collections handle swift exceptions
+etc. see\footnote{\url{https://github.com/Quick/Nimble#built-in-matcher-functions}} 
+
+Essentially it can be seen that the above asserions are far easier to
+read at a glance than the equivalent XCTestAssertions.
+
 \section{Quick framework and the Nimble matcher framework}
 \section{Swift and possibilities for learning via testing}
 \section{Conclusion}
-  
+  \begin{itemize}
+  \item{Tests should not only cover the functionality but be
+    expressive.}
+
+  \item{Test classes should be easy to read.}
+  \item{Test classes should ideally express not only the fine grained
+    logic but a higher level BDD like logic, \texttt{GIVEN, THEN, AND, SHOULD}}
+  \item{Test classes should ideally act as partial documentation, if a
+  developer wants to see how a class's logic works or how to perform an
+  operation then it should be easy to find the test suite ans read the
+  test code.}
+\end{itemize}
+
 \end{document}
 
 
