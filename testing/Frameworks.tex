@@ -32,10 +32,10 @@
 \title{An Investigation into frameworks for Test Driven
 Development on the iOS platform with further
 analysis of Business Driven Development as it relates to test naming
-conventions and their support or otherwise in the considered frameworks}
+conventions.}
 
 \author{Tim Storey \hfill for \hfill ICSA Software Ltd.
-        \\\texttt{tim.storey@gmail.com}}
+        \\\texttt{tim.storey@boardpad.com}}
 
 \date{June, 2016}
 
@@ -95,7 +95,7 @@ conventions and their support or otherwise in the considered frameworks}
     \ac{Then:}{some ACTION}
   \end{spec}
 
-  It is becoming common to specify behaviors this way as it allows
+  It is becoming common to specify behaviours this way as it allows
   scenarios to be described in manner which allows developers to build
   up code that matches the requirements easily without wasted effort and
   it also provides acceptance criteria. It is however worth noting that
@@ -398,7 +398,7 @@ The \mintinline{objc}{XCTest Case} above covers all the functions we
           });
       });
 
-      given(@"We have intialized correctly", ^{
+      given(@"We have initialized correctly", ^{
           
         it(@"Performs the logic we want", ^{
             expect([sut someMethod]).to.equal(someValue);
@@ -449,7 +449,7 @@ building up a complex set of tests that we would like to be very clear
 (i.e. read a documentation as well as cover the logic)
 they quickly become limited. 
 
-The only really meaninglfull error we get is the \texttt{format} string 
+The only really meaningful error we get is the \texttt{format} string 
 we pass into the macro as the last parameter. Furthermore asynchronous 
 testing not trivially catered for.
 
@@ -479,11 +479,11 @@ Matcher frameworks act as an API to express outcomes of a code unit.
 
 The Nimble\footnote{\url{https://github.com/Quick/Nimble}}  framework
 bundled with Quick\footnote{\url{https://github.com/Quick}} provides 
-us with the ability to write out tests in a manner that is cleareras the
-test describes itself much in the same manner as the test frame work
-allows us to use the \texttt{GIVEN, THEN, AND, SHOULD} syntax, only for
+us with the ability to write our tests in a manner that is clearer as the
+test describes itself much in the same manner as a BDD compliant
+framework allows us to use the \texttt{GIVEN, THEN, AND, SHOULD} syntax, only for
 the matchers we use \texttt{EXPECT} something to \texttt{BE SOMETHING},
-we have the sameset of matches as with XCAsserts and more to boot.
+we have the same set of matches as with XCAsserts and more to boot.
 
 Nimble provides the following expectations.
 \begin{listbox}{1}{Nimble Matchers}
@@ -558,25 +558,58 @@ expect(actual).notTo(haveCount(expected))
 and indeed more to pass tests over collections handle swift exceptions
 etc. see\footnote{\url{https://github.com/Quick/Nimble#built-in-matcher-functions}} 
 
-Essentially it can be seen that the above asserions are far easier to
+Essentially it can be seen that the above assertions are easier to
 read at a glance than the equivalent XCTestAssertions.
 
+Should the test fail then an error is thrown as with XCAssert however
+the framework is not reliant on the passed string to report the error.
+
+For example:
+
+\begin{listbox}{1}{Failure example}
+expect(@(1+1)).to(equal(@3));
+// failed - expected to equal <3.0000>, got <2.0000>
+\end{listbox}
+
+Nimble matchers also provide simple asynchronous tests as below
+
+\begin{listbox}{1}{Asynchronous example}
+expect(foo).withTimeout(3).toEventually(contain(@"bar"));
+\end{listbox}
+
+\textbf{NB} We don't not need to add the \texttt{withTimeout()} unless we wish to wait
+for more than the default 1 second.
+
 \section{Quick framework and the Nimble matcher framework}
-\section{Swift and possibilities for learning via testing}
+
+Quick is a testing framework written in Swift that supports a BDD syntax
+and comes bundled with a matcher framework, Nimble and is interoperable
+between both Swift and Objective-C 2.0. Tests can be written in both
+languages.
+
 \section{Conclusion}
-  \begin{itemize}
-  \item{Tests should not only cover the functionality but be
-    expressive.}
 
-  \item{Test classes should be easy to read.}
-  \item{Test classes should ideally express not only the fine grained
-    logic but a higher level BDD like logic, \texttt{GIVEN, THEN, AND, SHOULD}}
-  \item{Test classes should ideally act as partial documentation, if a
-  developer wants to see how a class's logic works or how to perform an
-  operation then it should be easy to find the test suite ans read the
-  test code.}
-\end{itemize}
+  It hopefully can be seen that well written tests add clarity to a code
+  base and can act as a form of documentation, this is far easier if the
+  framework supports a BDD like syntax and uses an easy to read matcher
+  framework.
 
+  Tests should cover the logic of the classes under test but should
+  also be expressive, and thereby easier to read quickly.
+
+  Tests should not only over the fine grained logic of the classes under
+  test but be expressive at a higher level, i.e. \texttt{GIVEN, THEN,
+  AND, SHOULD, EXPECT}
+
+  Tests should act as documentation of the code base, this is not to say
+  they should be the only documentation but they should be a part of
+  this.
+
+  \texttt{Quick/Nimble} would seem to be a good choice for testing as it
+  supports both Swift and Objective C and thus can be used as a means of
+  starting to work in Swift by writing tests in Swift and comes with a
+  comprehensive matcher framework. It also fully supports writing tests
+  in Objective-C and thus presents no obstacles.
 \end{document}
 
 
